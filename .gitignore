@@ -1,0 +1,10 @@
+# pycharm stuff:
+.idea
+
+# global
+.venv
+.env
+execute.py
+
+logs
+*.log
