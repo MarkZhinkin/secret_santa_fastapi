@@ -12,6 +12,5 @@ class UserCreate(User):
 
 
 class UserCreateResponse(User):
-    is_active: bool
     access_token: str
     token_type: str

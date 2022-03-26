@@ -5,7 +5,7 @@ from app.helpers.constants import CustomPasswordStr
 
 
 class UserLogin(User):
-    login_or_email: Union[EmailStr, str] = Field(..., max_length=255)
+    username: Union[EmailStr, str] = Field(..., max_length=255)
     password: CustomPasswordStr
 
 
