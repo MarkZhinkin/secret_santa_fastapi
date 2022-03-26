@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Optional, Callable
+from typing import Optional, Union
 
 from pydantic import UUID4
 
@@ -11,7 +11,7 @@ from fastapi_users.manager import FastAPIUsersException
 # from fastapi_users.password import get_password_hash
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 
-from sqlalchemy import select, update, and_
+from sqlalchemy import select, update, and_, or_, true
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql import null
 
@@ -32,13 +32,17 @@ from app.models.users_models import User as UserModel
 from app.schemas.users_shemas import U, UC, UD, UU, UserDB
 
 
-jwt_authentication: AuthenticationBackend = AuthenticationBackend(
-    name="jwt",
-    transport=BearerTransport(tokenUrl=f'{settings.API_PATH}/auth/jwt/login'),
-    get_strategy=JWTStrategy(
+def get_backend_strategy():
+    return JWTStrategy(
         secret=settings.SECRET_KEY,
         lifetime_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
+
+
+jwt_authentication: AuthenticationBackend = AuthenticationBackend(
+    name="jwt",
+    transport=BearerTransport(tokenUrl=f'{settings.API_PATH}/auth/jwt/login'),
+    get_strategy=get_backend_strategy()
 )
 
 
@@ -57,6 +61,30 @@ class UserManager(BaseUserManager[UC, UD]):
 
     users_db_model = UserModel
     email_verification_db_model = EmailVerification
+
+    async def validate_password(self, password: str, user: Union[UC, UD]) -> None:
+        # ToDo Add validations
+        pass
+
+    async def get_by_email(self, login_or_email: str) -> UD:
+        query = select(
+            self.users_db_model
+        ).where(
+            and_(
+                or_(
+                    self.users_db_model.login == login_or_email,
+                    self.users_db_model.email == login_or_email,
+                ),
+                self.users_db_model.is_active == true()
+            )
+
+        )
+        user = await database.fetch_one(query)
+
+        if user is None:
+            raise UserNotExists()
+
+        return user
 
     # async def create(
     #         self, user: UC, safe: bool = False, request: Optional[Request] = None, db: Session = Depends(get_db)
