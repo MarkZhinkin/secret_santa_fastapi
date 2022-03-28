@@ -6,13 +6,15 @@ authors = ["Mark <krotovod777@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-fastapi = "^0.75.0"
+fastapi = "^0.70.0"
 alembic = "^1.7.7"
-uvicorn = "^0.17.6"
-fastapi-users = {extras = ["sqlalchemy2"], version = "^9.3.0"}
+uvicorn = "^0.15.0"
+fastapi-users = {extras = ["sqlalchemy"], version = "^8.1.2"}
 python-dotenv = "^0.19.2"
 aiomysql = "^0.0.22"
 databases = "^0.5.5"
+python-http-client = "^3.3.7"
+sendgrid = "^6.9.7"
 
 [tool.poetry.dev-dependencies]
 
