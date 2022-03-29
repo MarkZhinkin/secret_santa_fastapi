@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Response, status, HTTPException
 
-from app.depends.managers.user_manager import jwt_authentication, get_backend_strategy
+from app.depends.managers.user_manager import jwt_authentication
 
 from app.schemas.users_shemas import UserCreate, UserCreateResponse
 from app.schemas.users_shemas import UC, UD
@@ -23,7 +23,7 @@ async def register(
 ):
     try:
         user = await user_manager.create(user=user_create_item, safe=True)
-        bearer_response = await jwt_authentication.login(get_backend_strategy(), user, response)
+        bearer_response = await jwt_authentication.get_login_response(user, response, user_manager)
         return bearer_response.__dict__
 
     except Exception as e:

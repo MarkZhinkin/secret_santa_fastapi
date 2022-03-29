@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi_users import FastAPIUsers
 from starlette.middleware.cors import CORSMiddleware
 
-from app.api import api_router
+from app.api import router
 from app.core.config import settings
 
 
@@ -34,7 +34,7 @@ class Application:
         return self.app
 
     def setup_routers(self) -> None:
-        self.app.include_router(api_router, prefix=settings.API_PATH)
+        self.app.include_router(router, prefix=settings.API_PATH)
 
         # The following operation needs to be at the end of this function
         self.use_route_names_as_operation_ids()
