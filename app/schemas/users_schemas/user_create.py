@@ -1,4 +1,4 @@
-from app.schemas.users_shemas import User
+from app.schemas.users_schemas import User
 from pydantic import Field, EmailStr
 from app.helpers.constants import CustomPasswordStr
 

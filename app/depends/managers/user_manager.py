@@ -17,8 +17,8 @@ from app.core.config import settings
 from app.helpers.constants import CODE_LIVE_TIME_MINUTES
 from app.models.bypass_models.email_verifications import EmailVerification
 from app.models.users_models import User as UserModel
-from app.schemas.users_shemas import U, UC, UD, UU, UserDB
-from app.schemas.emails_shemas import EVCCRQ
+from app.schemas.users_schemas import U, UC, UD, UU, UserDB
+from app.schemas.emails_schemas import EVCCRQ
 
 
 from fastapi_users.authentication import JWTAuthentication

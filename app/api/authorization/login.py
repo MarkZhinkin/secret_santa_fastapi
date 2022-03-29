@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Response, status, HTTPException
 
-from app.schemas.users_shemas import UserLogin, UserLoginResponse
-from app.schemas.users_shemas import UC, UD
+from app.schemas.users_schemas import UserLogin, UserLoginResponse
+from app.schemas.users_schemas import UC, UD
 
 from app.depends.managers.user_manager import jwt_authentication
 from app.depends.managers.user_manager import UserManager, get_user_manager

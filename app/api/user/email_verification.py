@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 
 from app.models.users_models import User
-from app.schemas.users_shemas import UC, UD
+from app.schemas.users_schemas import UC, UD
 
 from app.utils.sendgrid_post_office import SendgridPostOffice
 
 
 from app.depends.managers.user_manager import UserManager, get_user_manager, unverified_user
-from app.schemas.emails_shemas import (
+from app.schemas.emails_schemas import (
     EmailVerificationCodeResponse,
     EmailVerificationCodeConfirmRequest,
     EmailVerificationCodeConfirmResponse

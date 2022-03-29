@@ -1,4 +1,4 @@
-from app.schemas.emails_shemas import Email
+from app.schemas.emails_schemas import Email
 from typing import Union
 
 
