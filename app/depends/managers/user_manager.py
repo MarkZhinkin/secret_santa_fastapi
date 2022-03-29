@@ -124,6 +124,29 @@ class UserManager(BaseUserManager[UC, UD]):
         if verified_user is None:
             raise Exception("Users right didn't change.")
 
+    async def get_user_info(self,user: UD) -> UD:
+        query = select(
+            self.users_db_model.preferences,
+            self.users_db_model.department,
+            self.users_db_model.city,
+            self.users_db_model.street,
+            self.users_db_model.building,
+        ).where(
+            self.users_db_model.id == user.id
+        )
+        return await database.fetch_one(query)
+
+    async def change_preferences(self, user: UD, user_info_item: dict):
+        query = update(
+            self.users_db_model
+        ).where(
+            self.users_db_model.id == user.id
+        ).values(
+            user_info_item
+        )
+
+        await database.execute(query)
+
     @staticmethod
     def convert_timedelta_to_minutes(timedelta_obj: timedelta) -> float:
         return timedelta_obj.days * 24 * 60 + timedelta_obj.seconds / 60

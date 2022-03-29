@@ -3,6 +3,11 @@ from .user_create import UserCreate, UserCreateResponse
 from .user_login import UserLogin, UserLoginResponse
 from .user_update import UserUpdate
 from .user_db import UserDB
+from .user_info import (
+    UserInfoResponse,
+    UserInfoChangeRequest,
+    UserInfoChangeResponse
+)
 
 from typing import TypeVar
 
