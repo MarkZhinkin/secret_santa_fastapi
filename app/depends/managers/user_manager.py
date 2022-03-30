@@ -147,6 +147,27 @@ class UserManager(BaseUserManager[UC, UD]):
 
         await database.execute(query)
 
+    async def get_playing_users(self) -> list:
+        query = select(
+            self.users_db_model.first_name,
+            self.users_db_model.last_name,
+            self.users_db_model.email,
+            self.users_db_model.department
+        ).where(
+            self.users_db_model.is_playing == True
+        )
+
+        playing_users = await database.fetch_all(query)
+        return [
+            {
+                "first_name": playing_user["first_name"],
+                "last_name": playing_user["last_name"],
+                "email": playing_user["email"],
+                "department": playing_user["department"],
+            }
+            for playing_user in playing_users
+        ]
+
     @staticmethod
     def convert_timedelta_to_minutes(timedelta_obj: timedelta) -> float:
         return timedelta_obj.days * 24 * 60 + timedelta_obj.seconds / 60
