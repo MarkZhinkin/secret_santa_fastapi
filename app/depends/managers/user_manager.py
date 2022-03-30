@@ -136,7 +136,7 @@ class UserManager(BaseUserManager[UC, UD]):
         )
         return await database.fetch_one(query)
 
-    async def change_preferences(self, user: UD, user_info_item: dict):
+    async def change_user_info(self, user: UD, user_info_item: dict):
         query = update(
             self.users_db_model
         ).where(

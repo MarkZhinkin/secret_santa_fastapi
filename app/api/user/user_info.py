@@ -44,7 +44,7 @@ async def change_user_info(
     user: User = Depends(verified_user),
 ):
     try:
-        await user_manager.change_preferences(user=user, user_info_item=user_info_item.dict())
+        await user_manager.change_user_info(user=user, user_info_item=user_info_item.dict())
         return UserInfoChangeResponse(is_info_change=True)
 
     except Exception as e:
