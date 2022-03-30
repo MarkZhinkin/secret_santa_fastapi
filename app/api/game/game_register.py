@@ -1,0 +1,52 @@
+from fastapi import APIRouter, Depends, status, HTTPException
+
+from app.models.users_models import User
+from app.schemas.users_schemas import UC, UD
+
+from app.depends.managers.user_manager import UserManager, get_user_manager, verified_user
+from app.schemas.games_schemas import GameRegisterResponse, CancelGameRegisterResponse
+
+
+router = APIRouter()
+
+
+@router.get(
+    "/register",
+    response_model=GameRegisterResponse,
+    status_code=status.HTTP_200_OK,
+    name="register",
+)
+async def register(
+    user_manager: UserManager[UC, UD] = Depends(get_user_manager),
+    user: User = Depends(verified_user),
+):
+    try:
+        if not user.is_superuser:
+            await user_manager.change_user_info(user, {"is_playing": True})
+            return GameRegisterResponse(is_register_to_game=True)
+        else:
+            return GameRegisterResponse(reason="Administrator can't play in secret santa.")
+
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=e.__repr__())
+
+
+@router.get(
+    "/cancel",
+    response_model=CancelGameRegisterResponse,
+    status_code=status.HTTP_200_OK,
+    name="cancel",
+)
+async def cancel(
+    user_manager: UserManager[UC, UD] = Depends(get_user_manager),
+    user: User = Depends(verified_user),
+):
+    try:
+        if not user.is_superuser:
+            await user_manager.change_user_info(user, {"is_playing": False})
+            return CancelGameRegisterResponse(is_cancel_register_to_game=True)
+        else:
+            return GameRegisterResponse(reason="Administrator can't play in secret santa.")
+
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=e.__repr__())
