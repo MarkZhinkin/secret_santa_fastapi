@@ -9,7 +9,7 @@ class Game(Base, MysqlPrimaryKeyMixin, MysqlTimestampsMixin):
     # alembic revision --autogenerate -m "add games table"
     __tablename__ = "games"
 
-    game_year = Column(SMALLINT(unsigned=True), index=True, nullable=False)
+    game_year = Column(SMALLINT(unsigned=True), index=True, nullable=False, unique=True)
     is_registration_open = Column(BOOLEAN(), index=True, nullable=False, server_default=text("FALSE"))
     registration_opened_at = Column(TIMESTAMP, nullable=True)
     is_registration_close = Column(BOOLEAN(), index=True, nullable=False, server_default=text("FALSE"))

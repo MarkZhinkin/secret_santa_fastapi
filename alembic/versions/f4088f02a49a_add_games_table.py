@@ -29,7 +29,7 @@ def upgrade():
     sa.Column('updated_at', mysql.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_games_game_year'), 'games', ['game_year'], unique=False)
+    op.create_index(op.f('ix_games_game_year'), 'games', ['game_year'], unique=True)
     op.create_index(op.f('ix_games_is_registration_close'), 'games', ['is_registration_close'], unique=False)
     op.create_index(op.f('ix_games_is_registration_open'), 'games', ['is_registration_open'], unique=False)
     op.create_index(op.f('ix_games_updated_at'), 'games', ['updated_at'], unique=False)
