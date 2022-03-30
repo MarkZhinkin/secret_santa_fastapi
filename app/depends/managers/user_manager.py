@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Union
+from typing import Union, Type
 
 from fastapi import Depends
 from fastapi_users import FastAPIUsers
@@ -39,12 +39,12 @@ class UserNotExists(FastAPIUsersException):
 
 
 class UserManager(BaseUserManager[UC, UD]):
-    user_db_model = UserDB
-    reset_password_token_secret = settings.SECRET_KEY
-    verification_token_secret = settings.SECRET_KEY
+    user_db_model: Type[UD] = UserDB
+    reset_password_token_secret: str = settings.SECRET_KEY
+    verification_token_secret: str = settings.SECRET_KEY
 
-    users_db_model = UserModel
-    email_verification_db_model = EmailVerification
+    users_db_model: Type[UserModel] = UserModel
+    email_verification_db_model: Type[EmailVerification] = EmailVerification
 
     async def validate_password(self, password: str, user: Union[UC, UD]) -> None:
         # ToDo Add validations
