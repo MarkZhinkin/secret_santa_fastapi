@@ -13,8 +13,8 @@ class Participant(Base, MysqlPrimaryKeyMixin, MysqlTimestampsMixin):
 
     game_id = Column(BIGINT(unsigned=True), index=True, nullable=False, unique=False)
     secret_santa_id = Column(GUID(), index=True, nullable=False, unique=False)
-    gift_recipient = Column(GUID(), index=True, nullable=False, unique=False)
+    gift_recipient_id = Column(GUID(), index=True, nullable=False, unique=False)
     preferences = Column(TEXT(), index=False, nullable=True, unique=False)
 
     def __repr__(self):
-        return f"Game(id={self.id!r}, game_year={self.game_year!r})"
+        return f"Participant(id={self.id!r}, game_id={self.game_id!r})"
