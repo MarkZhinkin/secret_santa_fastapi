@@ -21,8 +21,8 @@ async def close_game(
     user: User = Depends(admin_user),
 ):
     try:
-        await game_manager.close_game()
-        # ToDo Create new participants
+        game_id = await game_manager.close_game()
+        await game_manager.generate_pairs(game_id)
         return GameCloseResponse(is_game_close=True)
 
     except Exception as e:
