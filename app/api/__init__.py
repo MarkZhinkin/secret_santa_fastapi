@@ -6,7 +6,6 @@ from app.api.game import game_router
 
 router = APIRouter()
 
-router.include_router(auth_router)
-router.include_router(user_router)
-router.include_router(game_router)
-
+router.include_router(auth_router, tags=["authorization"])
+router.include_router(user_router, tags=["user"])
+router.include_router(game_router, tags=["game"])
