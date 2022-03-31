@@ -23,7 +23,7 @@ def upgrade():
     sa.Column('id', mysql.BIGINT(unsigned=True), autoincrement=True, nullable=False),
     sa.Column('game_id', mysql.BIGINT(unsigned=True), nullable=False),
     sa.Column('secret_santa_id', fastapi_users_db_sqlalchemy.GUID(), nullable=False),
-    sa.Column('gift_recipient_id', fastapi_users_db_sqlalchemy.GUID(), nullable=False),
+    sa.Column('gift_recipient_id', fastapi_users_db_sqlalchemy.GUID(), nullable=True),
     sa.Column('preferences', mysql.TEXT(), nullable=True),
     sa.Column('created_at', mysql.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.Column('updated_at', mysql.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'), nullable=False),
