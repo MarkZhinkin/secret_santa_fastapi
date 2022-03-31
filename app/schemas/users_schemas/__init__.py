@@ -8,6 +8,7 @@ from .user_info import (
     UserInfoChangeRequest,
     UserInfoChangeResponse
 )
+from .gift_recipient_info import GiftRecipientInfoResponse
 
 from typing import TypeVar
 
