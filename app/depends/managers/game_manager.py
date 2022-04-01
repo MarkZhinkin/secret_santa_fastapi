@@ -1,4 +1,4 @@
-from copy import deepcopy
+from operator import attrgetter
 from typing import Generic, Type, Union
 
 from datetime import datetime
@@ -20,6 +20,27 @@ from app.schemas.users_schemas import UD
 
 
 class GameManager(Generic[G]):
+
+    class GameParticipant:
+        user_id: str
+        preferences: Union[str, None]
+
+        secret_santa_id: str
+        can_receive_gift_from: list = []
+        can_receive_gift_from_count: int = 0
+
+        def __init__(
+                self,
+                *,
+                user_id,
+                preferences,
+                can_receive_gift_from,
+                can_receive_gift_from_count
+        ):
+            self.user_id = user_id
+            self.preferences = preferences
+            self.can_receive_gift_from = can_receive_gift_from
+            self.can_receive_gift_from_count = can_receive_gift_from_count
 
     games_db_model: Type[GameModel] = GameModel
     users_db_model: Type[UserModel] = UserModel
@@ -100,43 +121,59 @@ class GameManager(Generic[G]):
             )
         )
         users = await database.fetch_all(query)
-
-        for user in users:
-            await self.change_user_game_status(user)
-
         if len(users) < 2:
             raise Exception("There are too low users in the game.")
 
-        users_dict = self.convert_users_rows_to_dict(users)
+        await self.change_users_game_status(users)
+
         recent_participants_pairs = await self.get_recent_participants_pairs()
-        users_dict = self.update_recent_gift_recipients(users_dict, recent_participants_pairs)
 
-        participants_pairs = []
-        for user_id, user_value in users_dict.items():
-            valid_gift_recipients_dict = self.get_valid_gift_recipients(user_id, users_dict)
-            if len(list(valid_gift_recipients_dict.keys())) != 0:
-                gift_recipient_id = random.choice(list(valid_gift_recipients_dict.keys()))
-                users_dict[gift_recipient_id]["is_gift_recipient"] = True
-            else:
-                gift_recipient_id = None
+        users_list = []
+        for user in users:
+            user_id: str = str(user.id)
+            can_receive_gift_from = self.create_receive_gift_from_list(user_id, recent_participants_pairs, users)
+            can_receive_gift_from_count = len(can_receive_gift_from)
 
-            participants_pair = {
-                "secret_santa_id": user_id,
-                "gift_recipient_id": gift_recipient_id,
-                "preferences": user_value["preferences"]
-            }
-            participants_pairs.append(participants_pair)
-            await self.insert_participants_pair(participants_pair, game_id)
+            users_list.append(
+                self.GameParticipant(
+                    user_id=user_id,
+                    preferences=user.preferences,
+                    can_receive_gift_from=can_receive_gift_from,
+                    can_receive_gift_from_count=can_receive_gift_from_count
+                )
+            )
+
+        for x in range(10):
+            sorted_users_list = sorted(users_list, key=attrgetter('can_receive_gift_from_count'))
+            participants_pairs = []
+            used_accounts = []
+            for user in sorted_users_list:
+                secret_santa_id = random.choice(list(filter(lambda x: x not in used_accounts, user.can_receive_gift_from)))
+                used_accounts.append(secret_santa_id)
+                user.secret_santa_id = secret_santa_id
+
+                participants_pair = {
+                    "secret_santa_id": secret_santa_id,
+                    "gift_recipient_id": user.user_id,
+                    "preferences": user.preferences
+                }
+                participants_pairs.append(participants_pair)
+
+            if not self.is_participants_correct(participants_pairs):
+                break
+
+        await self.insert_participants_pairs(participants_pairs, game_id)
 
         return participants_pairs
 
-    async def insert_participants_pair(self, participants_pair: dict, game_id: str):
-        query = insert(
-            self.participants_db_model
-        ).values(
-            {"game_id": game_id, **participants_pair}
-        )
-        await database.execute(query)
+    async def insert_participants_pairs(self, participants_pairs: list, game_id: str):
+        for participant_pair in participants_pairs:
+            query = insert(
+                self.participants_db_model
+            ).values(
+                {"game_id": game_id, **participant_pair}
+            )
+            await database.execute(query)
 
     async def get_recent_participants_pairs(self, years_before: int = 3) -> list:
         query_join = join(
@@ -145,7 +182,7 @@ class GameManager(Generic[G]):
             self.games_db_model.id == self.participants_db_model.game_id
         )
         query = select(self.participants_db_model).where(
-            self.games_db_model.game_year >= datetime.now().year - years_before
+            self.games_db_model.game_year > datetime.now().year - years_before
         ).select_from(query_join)
 
         return await database.fetch_all(query)
@@ -207,7 +244,7 @@ class GameManager(Generic[G]):
                     users_dict[participants_pair["secret_santa_id"]]["first_name"],
                     users_dict[participants_pair["secret_santa_id"]]["last_name"]
                 )),
-                "gift_recipient_full_name":  " ".join((
+                "gift_recipient_full_name": " ".join((
                     users_dict[participants_pair["gift_recipient_id"]]["first_name"],
                     users_dict[participants_pair["gift_recipient_id"]]["last_name"]
                 )),
@@ -216,13 +253,13 @@ class GameManager(Generic[G]):
             for participants_pair in participants_pairs
         ]
 
-    async def change_user_game_status(self, user: UD):
+    async def change_users_game_status(self, users: list):
         query = update(
             self.users_db_model
         ).values({
             "is_playing": False
         }).where(
-            self.users_db_model.id == user.id
+            self.users_db_model.id.in_([user.id for user in users])
         )
 
         await database.execute(query)
@@ -254,30 +291,26 @@ class GameManager(Generic[G]):
         return await database.fetch_one(query)
 
     @staticmethod
-    def get_valid_gift_recipients(user_id: str, users: dict) -> dict:
-        return {
-            k: v
-            for k, v in users.items() if
-            k != user_id and
-            k not in users[user_id]["was_santa_for"] and
-            v["is_gift_recipient"] is False
-        }
+    def create_receive_gift_from_list(user_id: str, recent_participants_pairs: list, users: list) -> list:
+        was_santa_for = [
+            str(participant_pairs.gift_recipient_id)
+            for participant_pairs in recent_participants_pairs if
+            str(participant_pairs.secret_santa_id) == user_id
+        ]
+
+        return [
+            str(user.id)
+            for user in users if
+            str(user.id) != user_id and
+            str(user.id) not in was_santa_for
+        ]
 
     @staticmethod
-    def convert_users_rows_to_dict(users: UD) -> dict:
-        return {str(user["id"]): {
-            "is_gift_recipient": False,
-            "preferences": user["preferences"],
-            "was_santa_for": []
-        } for user in users}
-
-    def update_recent_gift_recipients(self, users_dict: dict, recent_participants_pairs: list):
-        result_dict = deepcopy(users_dict)
-        for user_id, user_value in users_dict.items():
-            user_participants_pairs = list(filter(lambda x: str(x["secret_santa_id"]) == user_id, recent_participants_pairs))
-            result_dict[user_id]["was_santa_for"] = [str(x["gift_recipient_id"]) for x in user_participants_pairs]
-
-        return result_dict
+    def is_participants_correct(participants_pairs: list) -> bool:
+        return not True in [
+            participants_pair["secret_santa_id"] is None
+            for participants_pair in participants_pairs
+        ]
 
 
 def get_user_db():
