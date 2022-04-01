@@ -6,7 +6,7 @@ from app.schemas.games_schemas import G
 
 from app.depends.managers.user_manager import UserManager, get_user_manager, verified_user
 from app.schemas.games_schemas import GameRegisterResponse, CancelGameRegisterResponse
-from depends.managers.game_manager import GameManager, get_game_manager
+from app.depends.managers.game_manager import GameManager, get_game_manager
 
 router = APIRouter()
 
