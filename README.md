@@ -7,17 +7,19 @@ for create simple web-application "Secret Santa" for you team.
 
 #### Requirements
 1. [Python 3.8](https://www.python.org/downloads/release/python-380/)
-2. [FastApi](https://fastapi.tiangolo.com/)
-3. [Fastapi-users](https://github.com/fastapi-users/fastapi-users) - 
+2. [Node 12](https://nodejs.org/es/blog/release/v12.13.0/)
+3. [FastApi](https://fastapi.tiangolo.com/)
+4. [Fastapi-users](https://github.com/fastapi-users/fastapi-users) - 
 include base features for working with users.  
-4. [uvicorn](https://www.uvicorn.org/) -
+5. [uvicorn](https://www.uvicorn.org/) -
  helper for starting async web servers.
-5. [Sendgrid](https://sendgrid.com/) -
+6. [Sendgrid](https://sendgrid.com/) -
  mail postman. 
-6. [poetry](https://python-poetry.org/) - 
+7. [poetry](https://python-poetry.org/) - 
 packages and virtual environment manager. 
-7. [alembic](https://alembic.sqlalchemy.org/en/latest/) -
+8. [alembic](https://alembic.sqlalchemy.org/en/latest/) -
  database versions manager.
+9. [pm2](https://pm2.keymetrics.io/) - packages manager.
 
 #### Features 
 - registration and authorization by email or login; 
@@ -27,7 +29,7 @@ packages and virtual environment manager.
 
 #### Usage  
 - download project
-- add environment: `poetry install`
+- add environments: `poetry install`, `npm ci`
 - copy `cp .env.example .env` and fill .env file
 - add tables to database: `poetry run alembic upgrade head`
-- run `main.py` file
+- start application by command `pm2 start pm2-app.config.js`
