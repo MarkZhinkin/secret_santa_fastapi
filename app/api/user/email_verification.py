@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from app.models.users_models import User
 from app.schemas.users_schemas import UC, UD
 
-from app.utils.sendgrid_post_office import SendgridPostOffice
+# from app.utils.sendgrid_post_office import SendgridPostOffice
 
 
 from app.depends.managers.user_manager import UserManager, get_user_manager, unverified_user
@@ -12,6 +12,7 @@ from app.schemas.emails_schemas import (
     EmailVerificationCodeConfirmRequest,
     EmailVerificationCodeConfirmResponse
 )
+from app.helpers.random_codes_generator import generate_random_hash, generate_confirmation_code
 
 
 router = APIRouter()
@@ -29,17 +30,23 @@ async def send_code(
 ):
     try:
         user_email = user.email
-        send_grid = SendgridPostOffice()
-        send_status, code, message_uid = send_grid.email_confirmation_send_message(user_email)
+        # send_grid = SendgridPostOffice()
+        # send_status, code, message_uid = send_grid.email_confirmation_send_message(user_email)
 
-        if send_status >= 400:
-            raise Exception(f"Verification code didn't send, {send_status}.")
+        # if send_status >= 400:
+        #     raise Exception(f"Verification code didn't send, {send_status}.")
+
+        code = generate_confirmation_code()
+        message_uid = generate_random_hash()
 
         is_added = await user_manager.add_verification_code(email=user_email, code=code, message_uid=message_uid)
         if not is_added:
             raise Exception("Verification code didn't add.")
 
-        return EmailVerificationCodeResponse(message_uid=message_uid)
+        return EmailVerificationCodeResponse(
+            message_uid=message_uid,
+            message=f"On stage a message would be sent to your mail with the following content: {code}"
+        )
 
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=e.__repr__())
@@ -64,7 +71,7 @@ async def confirmation_code(
         await user_manager.delete_verification_code(verification_code_item.message_uid)
         await user_manager.change_user_right(user)
 
-        return EmailVerificationCodeConfirmResponse(is_user_verified=True)
+        return EmailVerificationCodeConfirmResponse(is_user_verified=True, reason="Code is correct.")
 
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=e.__repr__())

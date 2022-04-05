@@ -4,6 +4,7 @@ from typing import Union
 
 class EmailVerificationCodeResponse(Email):
     message_uid: str
+    message: str
 
 
 class EmailVerificationCodeConfirmRequest(Email):
