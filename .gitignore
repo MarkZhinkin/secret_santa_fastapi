@@ -5,6 +5,7 @@
 .venv
 .env
 execute.py
+node_modules
 
 logs
 *.log
