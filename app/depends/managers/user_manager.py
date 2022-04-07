@@ -20,10 +20,10 @@ from app.models.users_models import User as UserModel
 from app.schemas.users_schemas import U, UC, UD, UU, UserDB
 from app.schemas.emails_schemas import EVCCRQ
 
+from app.depends.swagger_support_jwt_authentication import SwaggerSupportJWTAuthentication
 
-from fastapi_users.authentication import JWTAuthentication
 
-jwt_authentication: JWTAuthentication = JWTAuthentication(
+jwt_authentication: SwaggerSupportJWTAuthentication = SwaggerSupportJWTAuthentication(
     secret=settings.SECRET_KEY,
     lifetime_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     tokenUrl=f'{settings.API_PATH}/auth/jwt/login',
@@ -45,10 +45,6 @@ class UserManager(BaseUserManager[UC, UD]):
 
     users_db_model: Type[UserModel] = UserModel
     email_verification_db_model: Type[EmailVerification] = EmailVerification
-
-    async def validate_password(self, password: str, user: Union[UC, UD]) -> None:
-        # ToDo Add validations
-        pass
 
     async def get_by_email(self, login_or_email: str) -> UD:
         query = select(
@@ -171,6 +167,32 @@ class UserManager(BaseUserManager[UC, UD]):
     @staticmethod
     def convert_timedelta_to_minutes(timedelta_obj: timedelta) -> float:
         return timedelta_obj.days * 24 * 60 + timedelta_obj.seconds / 60
+
+    @staticmethod
+    def validate_login_and_password(login, password):
+        LOGIN_ERROR_MESSAGE = "login must have length between 4 and 15 symbols, dont include special symbols and spaces."
+        PASSWORD_ERROR_MESSAGE = "password must have length more than 8 symbols, include upper and lower letters and special symbols."
+
+        if len(login) < 4 or len(login) > 15:
+            raise Exception(LOGIN_ERROR_MESSAGE)
+        if list(filter(lambda x: x != "_" and not x.isalpha() and not x.isdigit(), login)):
+            raise Exception(LOGIN_ERROR_MESSAGE)
+
+        lower_symbols_list = [chr(x) for x in range(97, 123)]
+        upper_symbols_list = [chr(x) for x in range(65, 91)]
+        special_symbols_list = \
+            [chr(x) for x in range(32, 65)] + \
+            [chr(x) for x in range(91, 95)] + \
+            [chr(x) for x in range(123, 127)]
+
+        if len(password) < 8:
+            raise Exception(PASSWORD_ERROR_MESSAGE)
+        if not list(filter(lambda x: x in lower_symbols_list, password)):
+            raise Exception(PASSWORD_ERROR_MESSAGE)
+        if not list(filter(lambda x: x in upper_symbols_list, password)):
+            raise Exception(PASSWORD_ERROR_MESSAGE)
+        if not list(filter(lambda x: x in special_symbols_list, password)):
+            raise Exception(PASSWORD_ERROR_MESSAGE)
 
 
 def get_user_db():
