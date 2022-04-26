@@ -9,6 +9,17 @@ class UserInfoResponse(User):
     street: Union[str, None] = None
     building: Union[str, None] = None
 
+    class Config:
+        schema_extra = {
+            "example": {
+                "preferences": "A good book.",
+                "department": "Editorial department",
+                "city": "New York",
+                "street": "West 10th Street",
+                "building": "14"
+            }
+        }
+
 
 class UserInfoChangeRequest(User):
     preferences: Optional[str]
@@ -17,6 +28,24 @@ class UserInfoChangeRequest(User):
     street: Optional[str]
     building: Optional[str]
 
+    class Config:
+        schema_extra = {
+            "example": {
+                "preferences": "A good book.",
+                "department": "Editorial department",
+                "city": "New York",
+                "street": "West 10th Street",
+                "building": "14"
+            }
+        }
+
 
 class UserInfoChangeResponse(User):
     is_info_change: bool = False
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "is_info_change": True
+            }
+        }

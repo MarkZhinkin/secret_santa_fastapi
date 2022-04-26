@@ -14,12 +14,17 @@ router = APIRouter()
     "/close_game",
     response_model=GameCloseResponse,
     status_code=status.HTTP_200_OK,
-    name="close game",
+    name="Close game"
 )
 async def close_game(
     game_manager: GameManager[G] = Depends(get_game_manager),
     user: User = Depends(admin_user),
 ):
+    """
+        **Superusers only**\n
+        Game will be closed and nobody will be added to the game.\n
+        At the same time, pairs will be create and users will can see his gift recipients.
+    """
     try:
         game_id = await game_manager.close_game()
         await game_manager.generate_pairs(game_id)

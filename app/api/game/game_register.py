@@ -22,6 +22,9 @@ async def register(
     game_manager: GameManager[G] = Depends(get_game_manager),
     user: User = Depends(verified_user),
 ):
+    """
+        If game is open users can register and take part in game this year.
+    """
     try:
         if not user.is_superuser:
             if await game_manager.get_current_game():
@@ -47,6 +50,9 @@ async def cancel(
     game_manager: GameManager[G] = Depends(get_game_manager),
     user: User = Depends(verified_user),
 ):
+    """
+        User can leave from game if registering don't stop'.
+    """
     try:
         if not user.is_superuser:
             if await game_manager.get_current_game():

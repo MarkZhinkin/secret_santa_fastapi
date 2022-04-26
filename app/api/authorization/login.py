@@ -14,13 +14,16 @@ router = APIRouter()
     "/login",
     response_model=UserLoginResponse,
     status_code=status.HTTP_200_OK,
-    name="login",
+    name="login"
 )
 async def login(
     user_login_item: UserLogin,
     response: Response,
     user_manager: UserManager[UC, UD] = Depends(get_user_manager)
 ):
+    """
+        The router that helps users log in and access the site.
+    """
     try:
         user = await user_manager.authenticate(user_login_item)
         bearer_response = await jwt_authentication.get_login_response(user, response, user_manager)

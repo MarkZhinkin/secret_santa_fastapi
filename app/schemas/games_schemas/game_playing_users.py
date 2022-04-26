@@ -16,3 +16,24 @@ class GamePlayingUser(CreateUpdateDictModel):
 
 class GamePlayingUsersResponse(Game):
     playing_users_list: List[GamePlayingUser] = []
+
+    class Config:
+        schema_extra = {
+            "example": [
+                {
+                    "first_name": "Stephen",
+                    "last_name": "King",
+                    "email": "horror.king@stephenking.com"
+                },
+                {
+                    "first_name": "George",
+                    "last_name": "Martin",
+                    "email": "king.of.night.king@georgerrmartin.com"
+                },
+                {
+                    "first_name": "Joanne",
+                    "last_name": "Rowling",
+                    "email": "witchcraft.queen.king@jkrowling.com"
+                },
+            ]
+        }

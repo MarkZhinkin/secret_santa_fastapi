@@ -20,6 +20,11 @@ async def open_game(
     game_manager: GameManager[G] = Depends(get_game_manager),
     user: User = Depends(admin_user),
 ):
+    """
+        **Superusers only**\n
+        Superusers can start only one game in current year.\n
+        If game already exist user will get alert.
+    """
     try:
         await game_manager.open_game()
         return GameOpenResponse(is_game_open=True)

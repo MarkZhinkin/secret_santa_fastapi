@@ -21,6 +21,9 @@ async def gift_recipient_info(
     game_manager: GameManager[G] = Depends(get_game_manager),
     user: User = Depends(verified_user),
 ):
+    """
+        Show all info about your gift recipient.
+    """
     try:
         gift_recipient_info = await game_manager.get_gift_recipient_info(user)
         if gift_recipient_info is None:

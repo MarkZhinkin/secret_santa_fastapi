@@ -15,6 +15,29 @@ class ParticipantsPairs(CreateUpdateDictModel):
 class GameParticipantsPairsResponse(Game):
     playing_users_list: List[ParticipantsPairs] = []
 
+    class Config:
+        orm_mode = True
+        schema_extra = {
+            "example": [
+                {
+                    "secret_santa_full_name": "Stephen King",
+                    "gift_recipient_full_name": "Joanne Rowling"
+                },
+                {
+                    "secret_santa_full_name": "Joanne Rowling",
+                    "gift_recipient_full_name": "George Martin"
+                }
+            ]
+        }
+
 
 class GameParticipantsPairsRequest(Game):
     year: int
+
+    class Config:
+        orm_mode = True
+        schema_extra = {
+            "example": {
+                "year": 2021
+            }
+        }

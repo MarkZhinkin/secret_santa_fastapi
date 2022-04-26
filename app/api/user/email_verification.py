@@ -28,6 +28,10 @@ async def send_code(
     user_manager: UserManager[UC, UD] = Depends(get_user_manager),
     user: User = Depends(unverified_user),
 ):
+    """
+        This router generate and send code for verification on a e-mail.\n
+        Now it's disabled and code include to message.
+    """
     try:
         user_email = user.email
         # send_grid = SendgridPostOffice()
@@ -63,6 +67,10 @@ async def confirmation_code(
     user_manager: UserManager[UC, UD] = Depends(get_user_manager),
     user: User = Depends(unverified_user),
 ):
+    """
+        Send you code for verify user.\n
+        This important because only verified users can play game.
+    """
     try:
         verification_code_row = await user_manager.get_verification_code_by_id(verification_code_item)
         if verification_code_row is None:

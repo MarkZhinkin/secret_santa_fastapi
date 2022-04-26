@@ -21,6 +21,9 @@ async def register(
     response: Response,
     user_manager: UserManager[UC, UD] = Depends(get_user_manager)
 ):
+    """
+        The router for registering new users.
+    """
     try:
         user_manager.validate_login_and_password(user_create_item.login, user_create_item.password)
         user = await user_manager.create(user=user_create_item, safe=True)

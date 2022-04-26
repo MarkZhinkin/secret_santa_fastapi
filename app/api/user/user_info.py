@@ -24,6 +24,9 @@ async def me(
     user_manager: UserManager[UC, UD] = Depends(get_user_manager),
     user: User = Depends(unverified_user),
 ):
+    """
+        Show all your public information.
+    """
     try:
         user_info = await user_manager.get_user_info(user)
         return UserInfoResponse(**user_info)
@@ -43,6 +46,9 @@ async def change_user_info(
     user_manager: UserManager[UC, UD] = Depends(get_user_manager),
     user: User = Depends(verified_user),
 ):
+    """
+        Change some or all info about myself.
+    """
     try:
         await user_manager.change_user_info(user=user, user_info_item=user_info_item.dict())
         return UserInfoChangeResponse(is_info_change=True)

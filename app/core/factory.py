@@ -12,6 +12,28 @@ from app.core.config import settings
 
 class Application:
 
+    description = """
+Secret Santa - is a good example Christmas game which 
+creates christmas mood.
+
+The sence of the game is that everybody don't know who 
+presented gift for him or her.  
+
+At the same time every player don't know to whom he will be present 
+a gift before lottery will be start. 
+
+This API include all function for start playing in Secret Santa after deploy this app. 
+
+This game include base rules: 
+- player can't give a gift to himself
+- game managers (superusers) can't play game 
+- player can see only him gift recipient
+
+And include custom rule:
+- player can get gift from the same player every three years
+    
+"""
+
     def __init__(self):
         self.settings = settings
         self.app: Union[FastAPI, None] = None
@@ -19,10 +41,13 @@ class Application:
     def create_app(self):
         self.app = FastAPI(
             title=settings.PROJECT_NAME,
-            # openapi_url=f"{settings.API_PATH}/openapi.json",
-            description=f"{settings.PROJECT_NAME} API",
-            # docs_url="/docs",
-            redoc_url=None,
+            version="1.0",
+            description=self.description,
+            contact={
+                "name": "Zhinkin Mark / Group BWT",
+                "url": "https://github.com/MarkZhinkin",
+                "email": "zhinkin_ma@groupbwt.com",
+            }
         )
 
         # ToDo Add static if it need.

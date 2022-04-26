@@ -47,6 +47,10 @@ async def games_list(
     game_manager: GameManager[G] = Depends(get_game_manager),
     user: User = Depends(admin_user),
 ):
+    """
+        **Superusers only**\n
+        Superusers can watch which games have previously been played.
+    """
     try:
         games_list = await game_manager.get_games_list()
         return GamesListResponse(
@@ -68,6 +72,10 @@ async def participants_pairs(
     game_manager: GameManager[G] = Depends(get_game_manager),
     user: User = Depends(admin_user),
 ):
+    """
+        **Superusers only**\n
+        Show all participants pairs.
+    """
     try:
         participants_pairs = await game_manager.get_participants_pairs(game_participants_pairs_item.year)
         return GameParticipantsPairsResponse(
